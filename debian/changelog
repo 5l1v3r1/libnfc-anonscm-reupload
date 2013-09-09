@@ -1,9 +1,10 @@
 libnfc (1.7.0-1) unstable; urgency=low
   
   * Upload to Debian. (Closes: #722066)
-  * New upstream release. (Closes: #722066)
   * Add patches/0001-Add-support-kFreeBSD.patch.
     Fix build on kFreeBSD.
+  * Update debian/control.
+    Add Ludovic Rousseau to Uploaders.
 
  -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Mon, 09 Sep 2013 13:10:26 +0900
 
