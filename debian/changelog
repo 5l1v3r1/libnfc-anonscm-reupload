@@ -1,3 +1,9 @@
+libnfc (1.7.0-1) unstable; urgency=low
+  
+  * Upload to Debian. (Closes: #722066)
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Mon, 09 Sep 2013 13:10:26 +0900
+
 libnfc (1.7.0-0) UNRELEASED; urgency=low
 
   * New upstream release
