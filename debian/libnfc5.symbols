@@ -1,4 +1,4 @@
-libnfc.so.4 libnfc4 #MINVER#
+libnfc.so.5 libnfc5 #MINVER#
  iso14443a_crc@Base 1.7.0~rc2
  iso14443a_crc_append@Base 1.7.0~rc2
  iso14443a_locate_historical_bytes@Base 1.7.0~rc2

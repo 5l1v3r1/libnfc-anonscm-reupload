@@ -9,7 +9,7 @@ Homepage: http://www.nfc-tools.org/
 Vcs-Git: https://code.googlecode.com/p/libnfc/
 Vcs-Browser: http://code.google.com/p/libnfc/source/browse/
 
-Package: libnfc4
+Package: libnfc5
 Architecture: any
 Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
@@ -28,7 +28,7 @@ Package: libnfc-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: ${misc:Depends}, libnfc4 (= ${binary:Version}), libusb-dev
+Depends: ${misc:Depends}, libnfc5 (= ${binary:Version}), libusb-dev
 Description: Near Field Communication (NFC) library (development files)
  libnfc is a library for Near Field Communication. It abstracts the
  low-level details of communicating with the devices away behind an
@@ -39,11 +39,11 @@ Description: Near Field Communication (NFC) library (development files)
  This package contains the header and development files needed to build
  programs and packages using libnfc.
 
-Package: libnfc4-dbg
+Package: libnfc5-dbg
 Section: debug
 Architecture: any
 Multi-Arch: same
-Depends: ${misc:Depends}, libnfc4 (= ${binary:Version})
+Depends: ${misc:Depends}, libnfc5 (= ${binary:Version})
 Description: Near Field Communication (NFC) library (debugging information)
  libnfc is a library for Near Field Communication. It abstracts the
  low-level details of communicating with the devices away behind an
@@ -56,7 +56,7 @@ Description: Near Field Communication (NFC) library (debugging information)
 Package: libnfc-bin
 Section: utils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc4 (>= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc5 (>= ${binary:Version})
 Description: Near Field Communication (NFC) binaries
  libnfc is a library for Near Field Communication. It abstracts the
  low-level details of communicating with the devices away behind an
@@ -71,7 +71,7 @@ Description: Near Field Communication (NFC) binaries
 Package: libnfc-examples
 Section: utils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc4 (>= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc5 (>= ${binary:Version})
 Description: Near Field Communication (NFC) examples
  libnfc is a library for Near Field Communication. It abstracts the
  low-level details of communicating with the devices away behind an
@@ -85,7 +85,7 @@ Description: Near Field Communication (NFC) examples
 Package: libnfc-pn53x-examples
 Section: utils
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc4 (>= ${binary:Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnfc5 (>= ${binary:Version})
 Description: Near Field Communication (NFC) examples for PN53x chips only
  libnfc is a library for Near Field Communication. It abstracts the
  low-level details of communicating with the devices away behind an
