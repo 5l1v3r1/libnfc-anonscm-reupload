@@ -1,0 +1,29 @@
+From 8be9cb7d28207161d33d17e95294ce72837ff9ac Mon Sep 17 00:00:00 2001
+From: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+Date: Tue, 10 Sep 2013 06:22:40 +0900
+Subject: [PATCH] Add support kFreeBSD
+
+kFreeBSD use cuaX as uart device.
+This supports the kFreeBSD in Debian, and fix failure to build.
+
+Signed-off-by: Nobuhiro Iwamatsu <iwamatsu@debian.org>
+---
+ libnfc/buses/uart.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libnfc/buses/uart.c b/libnfc/buses/uart.c
+index 2806553..3dd099a 100644
+--- a/libnfc/buses/uart.c
++++ b/libnfc/buses/uart.c
+@@ -59,7 +59,7 @@
+ 
+ #  if defined(__APPLE__)
+ const char *serial_ports_device_radix[] = { "tty.SLAB_USBtoUART", "tty.usbserial-", NULL };
+-#  elif defined (__FreeBSD__) || defined (__OpenBSD__)
++#  elif defined (__FreeBSD__) || defined (__OpenBSD__) || defined(__FreeBSD_kernel__)
+ const char *serial_ports_device_radix[] = { "cuaU", "cuau", NULL };
+ #  elif defined (__linux__)
+ const char *serial_ports_device_radix[] = { "ttyUSB", "ttyS", "ttyACM", "ttyAMA", "ttyO", NULL };
+-- 
+1.8.4.rc3
+
