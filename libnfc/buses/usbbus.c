@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -33,6 +34,8 @@
 #  include "config.h"
 #endif // HAVE_CONFIG_H
 
+#include <stdlib.h>
+
 #include "usbbus.h"
 #include "log.h"
 #define LOG_CATEGORY "libnfc.buses.usbbus"
@@ -41,21 +44,20 @@
 int usb_prepare(void)
 {
   static bool usb_initialized = false;
-  if (usb_initialized) {
-    return 0;
-  }
+  if (!usb_initialized) {
 
 #ifdef ENVVARS
-  char *env_log_level = getenv("LIBNFC_LOG_LEVEL");
-  // Set libusb debug only if asked explicitely:
-  // LIBUSB_LOG_LEVEL=12288 (= NFC_LOG_PRIORITY_DEBUG * 2 ^ NFC_LOG_GROUP_LIBUSB)
-  if (env_log_level && (((atoi(env_log_level) >> (NFC_LOG_GROUP_LIBUSB * 2)) & 0x00000003) >= NFC_LOG_PRIORITY_DEBUG)) {
-    setenv("USB_DEBUG", "255", 1);
-  }
+    char *env_log_level = getenv("LIBNFC_LOG_LEVEL");
+    // Set libusb debug only if asked explicitely:
+    // LIBUSB_LOG_LEVEL=12288 (= NFC_LOG_PRIORITY_DEBUG * 2 ^ NFC_LOG_GROUP_LIBUSB)
+    if (env_log_level && (((atoi(env_log_level) >> (NFC_LOG_GROUP_LIBUSB * 2)) & 0x00000003) >= NFC_LOG_PRIORITY_DEBUG)) {
+      setenv("USB_DEBUG", "255", 1);
+    }
 #endif
 
-  usb_init();
-  usb_initialized = true;
+    usb_init();
+    usb_initialized = true;
+  }
 
   int res;
   // usb_find_busses will find all of the busses on the system. Returns the

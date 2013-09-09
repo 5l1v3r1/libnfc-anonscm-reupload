@@ -1,8 +1,20 @@
+libnfc (1.7.0-0) UNRELEASED; urgency=low
+
+  * New upstream release
+
+ -- yobibe <yobibe@gmail.com>  Fri, 3 Sep 2013 16:42:42 +0100
+
 libnfc (1.7.0~rc7-1) unstable; urgency=low
 
   * Upload to Debian. (Closes: #672795)
 
  -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Wed, 28 Aug 2013 12:49:12 +0900
+
+libnfc (1.7.0~rc7-0) UNRELEASED; urgency=low
+
+  * New upstream release
+
+ -- yobibe <yobibe@gmail.com>  Fri, 5 Apr 2013 12:42:42 +0100
 
 libnfc (1.7.0~rc6-0) UNRELEASED; urgency=low
 

@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -294,8 +295,8 @@ typedef enum {
   PTM_ISO14443_4_PICC_ONLY = 0x04
 } pn53x_target_mode;
 
-extern const uint8_t pn53x_ack_frame[6];
-extern const uint8_t pn53x_nack_frame[6];
+extern const uint8_t pn53x_ack_frame[PN53x_ACK_FRAME__LEN];
+extern const uint8_t pn53x_nack_frame[PN53x_ACK_FRAME__LEN];
 
 int    pn53x_init(struct nfc_device *pnd);
 int    pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx, uint8_t *pbtRx, const size_t szRxLen, int timeout);

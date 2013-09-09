@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  * Copyright (C) 2011      Anugrah Redja Kusuma
  *
@@ -308,6 +309,8 @@ acr122s_build_frame(nfc_device *pnd,
     return false;
   if (data_size + should_prefix > 255)
     return false;
+  if (data == NULL)
+    return false;
 
   struct xfr_block_req *req = (struct xfr_block_req *) &frame[1];
   req->message_type = XFR_BLOCK_REQ_MSG;
@@ -384,7 +387,9 @@ acr122s_get_firmware_version(nfc_device *pnd, char *version, size_t length)
   int ret;
   uint8_t cmd[MAX_FRAME_SIZE];
 
-  acr122s_build_frame(pnd, cmd, sizeof(cmd), 0x48, 0, NULL, 0, 0);
+  if (! acr122s_build_frame(pnd, cmd, sizeof(cmd), 0x48, 0, NULL, 0, 0)) {
+    return NFC_EINVARG;
+  }
 
   if ((ret = acr122s_send_frame(pnd, cmd, 1000)) != 0)
     return ret;
@@ -637,7 +642,10 @@ acr122s_send(nfc_device *pnd, const uint8_t *buf, const size_t buf_len, int time
   uart_flush_input(DRIVER_DATA(pnd)->port);
 
   uint8_t cmd[MAX_FRAME_SIZE];
-  acr122s_build_frame(pnd, cmd, sizeof(cmd), 0, 0, buf, buf_len, 1);
+  if (! acr122s_build_frame(pnd, cmd, sizeof(cmd), 0, 0, buf, buf_len, 1)) {
+    return NFC_EINVARG;
+  }
+
   int ret;
   if ((ret = acr122s_send_frame(pnd, cmd, timeout)) != 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "%s", "Unable to transmit data. (TX)");

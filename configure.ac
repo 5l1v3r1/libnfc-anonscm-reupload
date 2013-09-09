@@ -1,7 +1,7 @@
 # General init
 
 # /!\ Don't forget to update 'CMakeLists.txt' too /!\
-AC_INIT([libnfc],[1.7.0-rc7],[nfc-tools@googlegroups.com])
+AC_INIT([libnfc],[1.7.0],[nfc-tools@googlegroups.com])
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -13,7 +13,7 @@ if test x"$GIT_REVISION" != x""; then
     AC_DEFINE_UNQUOTED([GIT_REVISION], ["$GIT_REVISION"], [GIT revision])
 fi
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE(subdir-objects dist-bzip2 no-dist-gzip)
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
@@ -39,16 +39,14 @@ case "$host" in
 esac
 AM_CONDITIONAL(POSIX_ONLY_EXAMPLES_ENABLED, [test "$WITH_POSIX_ONLY_EXAMPLES" = "1"])
 
-AC_PATH_PROG(PKG_CONFIG, pkg-config)
-if test x"$PKG_CONFIG" = x""; then
-    AC_MSG_ERROR([pkg-config not found.])
-fi
+PKG_PROG_PKG_CONFIG
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([fcntl.h limits.h stdio.h stdlib.h stdint.h stddef.h stdbool.h sys/ioctl.h sys/param.h sys/time.h termios.h])
 AC_CHECK_HEADERS([linux/spi/spidev.h], [spi_available="yes"])
+AC_CHECK_HEADERS([linux/i2c-dev.h], [i2c_available="yes"])
 AC_CHECK_FUNCS([memmove memset select strdup strerror strstr strtol usleep],
 	       [AC_DEFINE([_XOPEN_SOURCE], [600], [Enable POSIX extensions if present])])
 
@@ -124,6 +122,9 @@ AM_CONDITIONAL(UART_ENABLED, [test x"$uart_required" = x"yes"])
 
 # Enable SPI if
 AM_CONDITIONAL(SPI_ENABLED, [test x"$spi_required" = x"yes"])
+
+# Enable I2C if 
+AM_CONDITIONAL(I2C_ENABLED, [test x"$i2c_required" = x"yes"])
 
 # Documentation (default: no)
 AC_ARG_ENABLE([doc],AS_HELP_STRING([--enable-doc],[Enable documentation generation.]),[enable_doc=$enableval],[enable_doc="no"])

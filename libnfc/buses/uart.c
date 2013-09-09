@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -61,7 +62,7 @@ const char *serial_ports_device_radix[] = { "tty.SLAB_USBtoUART", "tty.usbserial
 #  elif defined (__FreeBSD__) || defined (__OpenBSD__)
 const char *serial_ports_device_radix[] = { "cuaU", "cuau", NULL };
 #  elif defined (__linux__)
-const char *serial_ports_device_radix[] = { "ttyUSB", "ttyS", "ttyACM", "ttyAMA", NULL };
+const char *serial_ports_device_radix[] = { "ttyUSB", "ttyS", "ttyACM", "ttyAMA", "ttyO", NULL };
 #  else
 #    error "Can't determine serial string for your system"
 #  endif
@@ -143,7 +144,7 @@ uart_flush_input(serial_port sp)
   }
   // There is something available, read the data
   (void)read(UART_DATA(sp)->fd, rx, available_bytes_count);
-  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%d bytes have eatten.", available_bytes_count);
+  log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%d bytes have eaten.", available_bytes_count);
   free(rx);
 }
 

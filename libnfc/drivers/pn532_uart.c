@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -282,7 +283,7 @@ int
 pn532_uart_wakeup(nfc_device *pnd)
 {
   /* High Speed Unit (HSU) wake up consist to send 0x55 and wait a "long" delay for PN532 being wakeup. */
-  const uint8_t pn532_wakeup_preamble[] = { 0x55, 0x55, 0x00, 0x00, 0x00 };
+  const uint8_t pn532_wakeup_preamble[] = { 0x55, 0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
   int res = uart_send(DRIVER_DATA(pnd)->port, pn532_wakeup_preamble, sizeof(pn532_wakeup_preamble), 0);
   CHIP_DATA(pnd)->power_mode = NORMAL; // PN532 should now be awake
   return res;
@@ -334,8 +335,8 @@ pn532_uart_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, in
     return pnd->last_error;
   }
 
-  uint8_t abtRxBuf[6];
-  res = uart_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 6, 0, timeout);
+  uint8_t abtRxBuf[PN53x_ACK_FRAME__LEN];
+  res = uart_receive(DRIVER_DATA(pnd)->port, abtRxBuf, sizeof(abtRxBuf), 0, timeout);
   if (res != 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%s", "Unable to read ACK");
     pnd->last_error = res;
@@ -366,7 +367,8 @@ pn532_uart_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, in
   pnd->last_error = uart_receive(DRIVER_DATA(pnd)->port, abtRxBuf, 5, abort_p, timeout);
 
   if (abort_p && (NFC_EOPABORTED == pnd->last_error)) {
-    return pn532_uart_ack(pnd);
+    pn532_uart_ack(pnd);
+    return NFC_EOPABORTED;
   }
 
   if (pnd->last_error < 0) {

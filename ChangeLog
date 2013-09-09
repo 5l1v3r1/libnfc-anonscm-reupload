@@ -1,3 +1,31 @@
+Sep 03, 2013 - 1.7.0
+-----------
+
+Fixes:
+ - pn53x: only create a current target when at least one have been found
+ - pn532_uart: fix 'operation abort' feature with this driver
+ - pn532_uart: let more time to PN532 to wake-up, this fix some specific cases
+   where PN532 shown one of two runs (Thanks to Marcello Morena)
+ - nfc-mfclassic: allow option f for read operation too
+ - Avoid clash with system's htole32 if it exists
+ - Include <stdlib.h>, required for getenv(3)
+ - usb: fix USB enumeration issue (Thanks to Mike Auty)
+ - acr122_pcsc: fix compilation on Mac OSX 10.8.4
+ - Fix pn53x_initiator_transceive_bytes_timed() measures for TypeB
+ - Various minor fixes: warnings, style, etc.
+
+Improvements:
+ - New PN532 over I2C driver, see contrib/libnfc/pn532_i2c_on_rpi.conf.sample
+ - ACR122/Touchatag: misc improvements
+ - ReadMobib/ReadNavigo: improve shell script portability
+ - Add ISO14443-4 chaining support for RX (MI)
+ - UART: add support for BeagleBone serial ports (Thanks to Johan Henselmans)
+ - nfc-mfultralight: allow setting of UID for special 'chinese' ultralight cards
+
+Special thanks to:
+ - Laurent Latil (new pn532_i2c driver for linux)
+ - Nobuhiro Iwamatsu (warning fixes and debian package)
+
 Apr 05, 2013 - 1.7.0-rc7 (release candidate)
 --------------------------------------------
 
@@ -42,6 +70,9 @@ Changes:
    so now you should test if context != NULL after nfc_init() call
  - API: nfc_initiator_target_is_present() & str_nfc_target()
    now take a pointer to nfc_target as argument instead of passing by value
+
+Special thanks to:
+ - Eugeny Boger (new pn532_spi driver for linux)
 
 Mar 03, 2013 - 1.7.0-rc6 (release candidate)
 --------------------------------------------

@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -112,10 +113,11 @@
  * Start bytes, packet length, length checksum, direction, packet checksum and postamble are overhead
  */
 // The TFI is considered part of the overhead
-#  define PN53x_NORMAL_FRAME__DATA_MAX_LEN		254
-#  define PN53x_NORMAL_FRAME__OVERHEAD			8
-#  define PN53x_EXTENDED_FRAME__DATA_MAX_LEN		264
-#  define PN53x_EXTENDED_FRAME__OVERHEAD		11
+#  define PN53x_NORMAL_FRAME__DATA_MAX_LEN              254
+#  define PN53x_NORMAL_FRAME__OVERHEAD                  8
+#  define PN53x_EXTENDED_FRAME__DATA_MAX_LEN            264
+#  define PN53x_EXTENDED_FRAME__OVERHEAD                11
+#  define PN53x_ACK_FRAME__LEN                          6
 
 typedef struct {
   uint8_t ui8Code;

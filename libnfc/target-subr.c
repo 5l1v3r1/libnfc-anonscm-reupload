@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -543,7 +544,9 @@ snprint_nfc_iso14443b_info(char *dst, size_t size, const nfc_iso14443b_info *pnb
       const int iMaxFrameSizes[] = { 16, 24, 32, 40, 48, 64, 96, 128, 256 };
       off += snprintf(dst + off, size - off, "* Maximum frame sizes: %d bytes\n", iMaxFrameSizes[((pnbi->abtProtocolInfo[1] & 0xf0) >> 4)]);
     }
-    if ((pnbi->abtProtocolInfo[1] & 0x0f) == PI_ISO14443_4_SUPPORTED) {
+    if ((pnbi->abtProtocolInfo[1] & 0x01) == PI_ISO14443_4_SUPPORTED) {
+      // in principle low nibble could only be 0000 or 0001 and other values are RFU
+      // but in practice we found 0011 so let's use only last bit for -4 compatibility
       off += snprintf(dst + off, size - off, "* Protocol types supported: ISO/IEC 14443-4\n");
     }
     off += snprintf(dst + off, size - off, "* Frame Waiting Time: %.4g ms\n", 256.0 * 16.0 * (1 << ((pnbi->abtProtocolInfo[2] & 0xf0) >> 4)) / 13560.0);

@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * Redistribution and use in source and binary forms, with or without
@@ -87,11 +88,11 @@ bool    nfc_initiator_mifare_cmd(nfc_device *pnd, const mifare_cmd mc, const uin
 
 // MIFARE Classic
 typedef struct {
-  uint8_t  abtUID[4];
+  uint8_t  abtUID[4];  // beware for 7bytes UID it goes over next fields
   uint8_t  btBCC;
-  uint8_t  btUnknown;
+  uint8_t  btSAK;      // beware it's not always exactly SAK
   uint8_t  abtATQA[2];
-  uint8_t  abtUnknown[8];
+  uint8_t  abtManufacturer[8];
 } mifare_classic_block_manufacturer;
 
 typedef struct {

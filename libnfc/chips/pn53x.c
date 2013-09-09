@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -82,7 +83,7 @@ pn53x_init(struct nfc_device *pnd)
   }
 
   if (!CHIP_DATA(pnd)->supported_modulation_as_initiator) {
-    CHIP_DATA(pnd)->supported_modulation_as_initiator = malloc(sizeof(nfc_modulation) * 9);
+    CHIP_DATA(pnd)->supported_modulation_as_initiator = malloc(sizeof(nfc_modulation_type) * 9);
     if (! CHIP_DATA(pnd)->supported_modulation_as_initiator)
       return NFC_ESOFT;
     int nbSupportedModulation = 0;
@@ -153,6 +154,7 @@ pn53x_reset_settings(struct nfc_device *pnd)
 int
 pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx, uint8_t *pbtRx, const size_t szRxLen, int timeout)
 {
+  bool mi = false;
   int res = 0;
   if (CHIP_DATA(pnd)->wb_trigged) {
     if ((res = pn53x_writeback_register(pnd)) < 0) {
@@ -162,7 +164,7 @@ pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx
 
   PNCMD_TRACE(pbtTx[0]);
   if (timeout > 0) {
-    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Timeout values: %d", timeout);
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Timeout value: %d", timeout);
   } else if (timeout == 0) {
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%s", "No timeout");
   } else if (timeout == -1) {
@@ -202,7 +204,6 @@ pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx
     CHIP_DATA(pnd)->power_mode = NORMAL; // When TgInitAsTarget reply that means an external RF have waken up the chip
   }
 
-  szRx = (size_t) res;
   switch (pbtTx[0]) {
     case PowerDown:
     case InDataExchange:
@@ -219,7 +220,8 @@ pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx
     case TgSetGeneralBytes:
     case TgSetMetaData:
       if (pbtRx[0] & 0x80) { abort(); } // NAD detected
-      if (pbtRx[0] & 0x40) { abort(); } // MI detected
+//      if (pbtRx[0] & 0x40) { abort(); } // MI detected
+      mi = pbtRx[0] & 0x40;
       CHIP_DATA(pnd)->last_status_byte = pbtRx[0] & 0x3f;
       break;
     case Diagnose:
@@ -251,6 +253,29 @@ pn53x_transceive(struct nfc_device *pnd, const uint8_t *pbtTx, const size_t szTx
     default:
       CHIP_DATA(pnd)->last_status_byte = 0;
   }
+
+  while (mi) {
+    int res2;
+    uint8_t  abtRx2[PN53x_EXTENDED_FRAME__DATA_MAX_LEN];
+    // Send empty command to card
+    if ((res2 = CHIP_DATA(pnd)->io->send(pnd, pbtTx, 2, timeout)) < 0) {
+      return res2;
+    }
+    if ((res2 = CHIP_DATA(pnd)->io->receive(pnd, abtRx2, sizeof(abtRx2), timeout)) < 0) {
+      return res2;
+    }
+    mi = abtRx2[0] & 0x40;
+    if ((size_t)(res + res2 - 1) > szRx) {
+      CHIP_DATA(pnd)->last_status_byte = ESMALLBUF;
+      break;
+    }
+    memcpy(pbtRx + res, abtRx2 + 1, res2 - 1);
+    // Copy last status byte
+    pbtRx[0] = abtRx2[0];
+    res += res2 - 1;
+  }
+
+  szRx = (size_t) res;
 
   switch (CHIP_DATA(pnd)->last_status_byte) {
     case 0:
@@ -1247,10 +1272,11 @@ pn53x_initiator_select_dep_target(struct nfc_device *pnd,
   } else {
     res = pn53x_InJumpForDEP(pnd, ndm, nbr, pbtPassiveInitiatorData, NULL, NULL, 0, pnt, timeout);
   }
-  if (res >= 0)
+  if (res > 0) {
     if (pn53x_current_target_new(pnd, pnt) == NULL) {
       return NFC_ESOFT;
     }
+  }
   return res;
 }
 
@@ -1441,10 +1467,10 @@ static uint32_t __pn53x_get_timer(struct nfc_device *pnd, const uint8_t last_cmd
       u32cycles -= (5 * 128);
     }
     // Correction depending on last parity bit sent
-    parity = (last_cmd_byte >> 7) ^((last_cmd_byte >> 6) & 1) ^
-             ((last_cmd_byte >> 5) & 1) ^((last_cmd_byte >> 4) & 1) ^
-             ((last_cmd_byte >> 3) & 1) ^((last_cmd_byte >> 2) & 1) ^
-             ((last_cmd_byte >> 1) & 1) ^(last_cmd_byte & 1);
+    parity = (last_cmd_byte >> 7) ^ ((last_cmd_byte >> 6) & 1) ^
+             ((last_cmd_byte >> 5) & 1) ^ ((last_cmd_byte >> 4) & 1) ^
+             ((last_cmd_byte >> 3) & 1) ^ ((last_cmd_byte >> 2) & 1) ^
+             ((last_cmd_byte >> 1) & 1) ^ (last_cmd_byte & 1);
     parity = parity ? 0 : 1;
     // When sent ...YY (cmd ends with logical 1, so when last parity bit is 1):
     if (parity) {
@@ -1579,6 +1605,13 @@ pn53x_initiator_transceive_bytes_timed(struct nfc_device *pnd, const uint8_t *pb
     return pnd->last_error;
   }
 
+  uint8_t txmode = 0;
+  if (pnd->bCrc) { // check if we're in TypeA or TypeB mode to compute right CRC later
+    if ((res = pn53x_read_register(pnd, PN53X_REG_CIU_TxMode, &txmode)) < 0) {
+      return res;
+    }
+  }
+
   __pn53x_init_timer(pnd, *cycles);
 
   // Once timer is started, we cannot use Tama commands anymore.
@@ -1663,7 +1696,12 @@ pn53x_initiator_transceive_bytes_timed(struct nfc_device *pnd, const uint8_t *pb
     if (!pbtTxRaw)
       return NFC_ESOFT;
     memcpy(pbtTxRaw, pbtTx, szTx);
-    iso14443a_crc_append(pbtTxRaw, szTx);
+    if ((txmode & SYMBOL_TX_FRAMING) == 0x00)
+      iso14443a_crc_append(pbtTxRaw, szTx);
+    else if ((txmode & SYMBOL_TX_FRAMING) == 0x03)
+      iso14443b_crc_append(pbtTxRaw, szTx);
+    else
+      log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "Unsupported framing type %02X, cannot adjust CRC cycles", txmode & SYMBOL_TX_FRAMING);
     *cycles = __pn53x_get_timer(pnd, pbtTxRaw[szTx + 1]);
     free(pbtTxRaw);
   } else {
@@ -2892,7 +2930,7 @@ pn53x_nm_to_ptt(const nfc_modulation nm)
 }
 
 int
-pn53x_get_supported_modulation(nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type * *const supported_mt)
+pn53x_get_supported_modulation(nfc_device *pnd, const nfc_mode mode, const nfc_modulation_type **const supported_mt)
 {
   switch (mode) {
     case N_TARGET:
@@ -2908,7 +2946,7 @@ pn53x_get_supported_modulation(nfc_device *pnd, const nfc_mode mode, const nfc_m
 }
 
 int
-pn53x_get_supported_baud_rate(nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate * *const supported_br)
+pn53x_get_supported_baud_rate(nfc_device *pnd, const nfc_modulation_type nmt, const nfc_baud_rate **const supported_br)
 {
   switch (nmt) {
     case NMT_FELICA:
@@ -3102,6 +3140,9 @@ pn53x_get_information_about(nfc_device *pnd, char **pbuf)
 void *
 pn53x_current_target_new(const struct nfc_device *pnd, const nfc_target *pnt)
 {
+  if (pnt == NULL) {
+    return NULL;
+  }
   // Keep the current nfc_target for further commands
   if (CHIP_DATA(pnd)->current_target) {
     free(CHIP_DATA(pnd)->current_target);
@@ -3129,7 +3170,7 @@ pn53x_current_target_is(const struct nfc_device *pnd, const nfc_target *pnt)
   if ((CHIP_DATA(pnd)->current_target == NULL) || (pnt == NULL)) {
     return false;
   }
-  // XXX It will not work if t is not binary-equal to current target
+  // XXX It will not work if it is not binary-equal to current target
   if (0 != memcmp(pnt, CHIP_DATA(pnd)->current_target, sizeof(nfc_target))) {
     return false;
   }

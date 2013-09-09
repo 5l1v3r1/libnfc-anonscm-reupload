@@ -1,3 +1,13 @@
+New in 1.7.0:
+
+Drivers:
+
+  * New PN532 over I2C driver, see contrib/libnfc/pn532_i2c_on_rpi.conf.sample
+
+API Changes:
+
+  * New function iso14443b_crc_append()
+
 New in 1.7.0-rc7:
 
 Drivers:
@@ -33,7 +43,7 @@ Configuration:
   activation. This file (/etc/nfc/libnfc.conf under GNU/Linux systems)
   supports already some keywords:
     - "allow_autoscan" to enable/disable device auto-detection feature;
-    - "allow_intrusive_autoscan" to enable/disable intrusive auto-detection
+    - "allow_intrusive_scan" to enable/disable intrusive auto-detection
       (ie. serial port probing);
     - "log_level" to select library verbosity;
     - "device.name" and "device.connstring" to define a user device,

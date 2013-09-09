@@ -4,11 +4,12 @@
  * Libnfc historical contributors:
  * Copyright (C) 2009      Roel Verdult
  * Copyright (C) 2009-2013 Romuald Conty
- * Copyright (C) 2010-2012 Romain Tartière
+ * Copyright (C) 2010-2012 Romain Tarti?re
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
  * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
+ * Copyright (C) 2013      Laurent Latil
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
@@ -25,24 +26,16 @@
  */
 
 /**
- * @file unistd.h
- * @brief This file intended to serve as a drop-in replacement for unistd.h on Windows
+ * @file pn532_i2c.h
+ * @brief Driver for PN532 connected through I2C bus
  */
 
-#ifndef _UNISTD_H_
-#define _UNISTD_H_
+#ifndef __NFC_DRIVER_PN532_I2C_H__
+#define __NFC_DRIVER_PN532_I2C_H__
 
-#include "contrib/windows.h"
+#include <nfc/nfc-types.h>
 
-// Needed by Sleep() under Windows
-#  include <winbase.h>
-#  define sleep(X) Sleep( X * 1000)
+/* Reference to the I2C driver structure */
+extern const struct nfc_driver pn532_i2c_driver;
 
-// With MinGW, getopt(3) is provided as separate header
-#if defined(WIN32) && defined(__GNUC__) /* mingw compiler */
-#include <getopt.h>
-#endif
-
-
-#endif /* _UNISTD_H_ */
-
+#endif // ! __NFC_DRIVER_I2C_H__

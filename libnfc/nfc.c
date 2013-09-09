@@ -7,6 +7,7 @@
  * Copyright (C) 2010-2012 Romain Tartière
  * Copyright (C) 2010-2013 Philippe Teuwen
  * Copyright (C) 2012-2013 Ludovic Rousseau
+ * See AUTHORS file for a more comprehensive list of contributors.
  * Additional contributors of this file:
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -113,6 +114,10 @@
 #  include "drivers/pn532_spi.h"
 #endif /* DRIVER_PN532_SPI_ENABLED */
 
+#if defined (DRIVER_PN532_I2C_ENABLED)
+#  include "drivers/pn532_i2c.h"
+#endif /* DRIVER_PN532_I2C_ENABLED */
+
 
 #define LOG_CATEGORY "libnfc.general"
 #define LOG_GROUP    NFC_LOG_GROUP_GENERAL
@@ -145,10 +150,14 @@ nfc_drivers_init(void)
 #if defined (DRIVER_PN532_SPI_ENABLED)
   nfc_register_driver(&pn532_spi_driver);
 #endif /* DRIVER_PN532_SPI_ENABLED */
+#if defined (DRIVER_PN532_I2C_ENABLED)
+  nfc_register_driver(&pn532_i2c_driver);
+#endif /* DRIVER_PN532_I2C_ENABLED */
 #if defined (DRIVER_ARYGON_ENABLED)
   nfc_register_driver(&arygon_driver);
 #endif /* DRIVER_ARYGON_ENABLED */
 }
+
 
 /** @ingroup lib
  * @brief Register an NFC device driver with libnfc.
