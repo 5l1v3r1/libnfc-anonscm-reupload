@@ -1,3 +1,11 @@
+libnfc (1.7.0-2) unstable; urgency=low
+
+  * Update debian/control.
+    - Add Replaces and Breaks for libnfc4.
+    - Update Vcs-Git and Vcs-Browser field.
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Wed, 18 Sep 2013 13:55:20 +0900
+
 libnfc (1.7.0-1) unstable; urgency=low
   
   * Upload to Debian. (Closes: #722066)
