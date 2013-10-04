@@ -1,2 +1,3 @@
 debian/tmp/usr/lib/*/libnfc.so.*
 contrib/udev/42-pn53x.rules lib/udev/rules.d/
+contrib/linux/blacklist-libnfc.conf etc/modprobe.d
