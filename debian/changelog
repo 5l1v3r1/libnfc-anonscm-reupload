@@ -1,4 +1,4 @@
-libnfc (1.7.0-4) UNRELEASED; urgency=low
+libnfc (1.7.0-3) unstable; urgency=low
 
   [ Ludovic Rousseau ]
   * update debian/watch: update the URL to make uscan work again
