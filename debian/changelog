@@ -1,6 +1,7 @@
 libnfc (1.7.1-1) unstable; urgency=low
 
   * New upstream released.
+  * Remove debian/patches.
 
  -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Wed, 05 Mar 2014 09:07:14 +0900
 
