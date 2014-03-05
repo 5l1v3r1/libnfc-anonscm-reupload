@@ -134,7 +134,8 @@ conf_keyvalue_context(void *data, const char *key, const char *value)
       }
       context->user_defined_device_count++;
     }
-    strcpy(context->user_defined_devices[context->user_defined_device_count - 1].name, value);
+    strncpy(context->user_defined_devices[context->user_defined_device_count - 1].name, value, DEVICE_NAME_LENGTH - 1);
+    context->user_defined_devices[context->user_defined_device_count - 1].name[DEVICE_NAME_LENGTH - 1] = '\0';
   } else if (strcmp(key, "device.connstring") == 0) {
     if ((context->user_defined_device_count == 0) || strcmp(context->user_defined_devices[context->user_defined_device_count - 1].connstring, "") != 0) {
       if (context->user_defined_device_count >= MAX_USER_DEFINED_DEVICES) {
@@ -143,7 +144,8 @@ conf_keyvalue_context(void *data, const char *key, const char *value)
       }
       context->user_defined_device_count++;
     }
-    strcpy(context->user_defined_devices[context->user_defined_device_count - 1].connstring, value);
+    strncpy(context->user_defined_devices[context->user_defined_device_count - 1].connstring, value, NFC_BUFSIZE_CONNSTRING - 1);
+    context->user_defined_devices[context->user_defined_device_count - 1].connstring[NFC_BUFSIZE_CONNSTRING - 1] = '\0';
   } else if (strcmp(key, "device.optional") == 0) {
     if ((context->user_defined_device_count == 0) || context->user_defined_devices[context->user_defined_device_count - 1].optional) {
       if (context->user_defined_device_count >= MAX_USER_DEFINED_DEVICES) {
@@ -175,10 +177,14 @@ conf_devices_load(const char *dirname, nfc_context *context)
     log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "Unable to open directory: %s", dirname);
   } else {
     struct dirent *de;
+#ifdef WIN32
+    while ((de =  readdir(d)) != NULL)  {
+#else
     struct dirent entry;
     struct dirent *result;
     while ((readdir_r(d, &entry, &result) == 0) && (result != NULL)) {
       de = &entry;
+#endif
       if (de->d_name[0] != '.') {
         const size_t filename_len = strlen(de->d_name);
         const size_t extension_len = strlen(".conf");

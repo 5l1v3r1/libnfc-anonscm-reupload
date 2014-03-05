@@ -57,9 +57,25 @@
 #define LOG_GROUP    NFC_LOG_GROUP_COM
 #define LOG_CATEGORY "libnfc.bus.uart"
 
+#ifndef _WIN32
+// Needed by sleep() under Unix
+#  include <unistd.h>
+#  include <time.h>
+#  define msleep(x) do { \
+    struct timespec xsleep; \
+    xsleep.tv_sec = x / 1000; \
+    xsleep.tv_nsec = (x - xsleep.tv_sec * 1000) * 1000 * 1000; \
+    nanosleep(&xsleep, NULL); \
+  } while (0)
+#else
+// Needed by Sleep() under Windows
+#  include <winbase.h>
+#  define msleep Sleep
+#endif
+
 #  if defined(__APPLE__)
 const char *serial_ports_device_radix[] = { "tty.SLAB_USBtoUART", "tty.usbserial-", NULL };
-#  elif defined (__FreeBSD__) || defined (__OpenBSD__)
+#  elif defined (__FreeBSD__) || defined (__OpenBSD__) || defined(__FreeBSD_kernel__)
 const char *serial_ports_device_radix[] = { "cuaU", "cuau", NULL };
 #  elif defined (__linux__)
 const char *serial_ports_device_radix[] = { "ttyUSB", "ttyS", "ttyACM", "ttyAMA", "ttyO", NULL };
@@ -122,8 +138,16 @@ uart_open(const char *pcPortName)
 }
 
 void
-uart_flush_input(serial_port sp)
+uart_flush_input(serial_port sp, bool wait)
 {
+  // flush commands may seem to be without effect
+  // if asked too quickly after previous event, cf comments below
+  // therefore a "wait" argument allows now to wait before flushing
+  // I believe that now the byte-eater part is not required anymore --Phil
+  if (wait) {
+    msleep(50); // 50 ms
+  }
+
   // This line seems to produce absolutely no effect on my system (GNU/Linux 2.6.35)
   tcflush(UART_DATA(sp)->fd, TCIFLUSH);
   // So, I wrote this byte-eater
@@ -143,7 +167,11 @@ uart_flush_input(serial_port sp)
     return;
   }
   // There is something available, read the data
-  (void)read(UART_DATA(sp)->fd, rx, available_bytes_count);
+  if (read(UART_DATA(sp)->fd, rx, available_bytes_count) < 0) {
+    perror("uart read");
+    free(rx);
+    return;
+  }
   log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_DEBUG, "%d bytes have eaten.", available_bytes_count);
   free(rx);
 }

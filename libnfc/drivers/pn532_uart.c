@@ -86,7 +86,7 @@ pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const 
 
     if ((sp != INVALID_SERIAL_PORT) && (sp != CLAIMED_SERIAL_PORT)) {
       // We need to flush input to be sure first reply does not comes from older byte transceive
-      uart_flush_input(sp);
+      uart_flush_input(sp, true);
       // Serial port claimed but we need to check if a PN532_UART is opened.
       uart_set_speed(sp, PN532_UART_DEFAULT_SPEED);
 
@@ -96,6 +96,11 @@ pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const 
       if (!pnd) {
         perror("malloc");
         uart_close(sp);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
         return 0;
       }
       pnd->driver = &pn532_uart_driver;
@@ -104,6 +109,11 @@ pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const 
         perror("malloc");
         uart_close(sp);
         nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
         return 0;
       }
       DRIVER_DATA(pnd)->port = sp;
@@ -113,6 +123,11 @@ pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const 
         perror("malloc");
         uart_close(DRIVER_DATA(pnd)->port);
         nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
         return 0;
       }
       // SAMConfiguration command if needed to wakeup the chip and pn53x_SAMConfiguration check if the chip is a PN532
@@ -126,6 +141,11 @@ pn532_uart_scan(const nfc_context *context, nfc_connstring connstrings[], const 
         uart_close(DRIVER_DATA(pnd)->port);
         pn53x_data_free(pnd);
         nfc_device_free(pnd);
+        iDevice = 0;
+        while ((acPort = acPorts[iDevice++])) {
+          free((void *)acPort);
+        }
+        free(acPorts);
         return 0;
       }
 #else
@@ -217,7 +237,7 @@ pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
     return NULL;
   }
   // We need to flush input to be sure first reply does not comes from older byte transceive
-  uart_flush_input(sp);
+  uart_flush_input(sp, true);
   uart_set_speed(sp, ndd.speed);
 
   // We have a connection
@@ -270,7 +290,7 @@ pn532_uart_open(const nfc_context *context, const nfc_connstring connstring)
 
   // Check communication using "Diagnose" command, with "Communication test" (0x00)
   if (pn53x_check_communication(pnd) < 0) {
-    nfc_perror(pnd, "pn53x_check_communication");
+    log_put(LOG_GROUP, LOG_CATEGORY, NFC_LOG_PRIORITY_ERROR, "pn53x_check_communication error");
     pn532_uart_close(pnd);
     return NULL;
   }
@@ -295,7 +315,7 @@ pn532_uart_send(nfc_device *pnd, const uint8_t *pbtData, const size_t szData, in
 {
   int res = 0;
   // Before sending anything, we need to discard from any junk bytes
-  uart_flush_input(DRIVER_DATA(pnd)->port);
+  uart_flush_input(DRIVER_DATA(pnd)->port, false);
 
   switch (CHIP_DATA(pnd)->power_mode) {
     case LOWVBAT: {
@@ -474,7 +494,7 @@ pn532_uart_receive(nfc_device *pnd, uint8_t *pbtData, const size_t szDataLen, in
   // The PN53x command is done and we successfully received the reply
   return len;
 error:
-  uart_flush_input(DRIVER_DATA(pnd)->port);
+  uart_flush_input(DRIVER_DATA(pnd)->port, true);
   return pnd->last_error;
 }
 
