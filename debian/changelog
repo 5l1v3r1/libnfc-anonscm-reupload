@@ -2,6 +2,8 @@ libnfc (1.7.1-1) unstable; urgency=low
 
   * New upstream released.
   * Remove debian/patches.
+  * Update debian/control.
+    - Update Standards-Version to 3.9.5.
 
  -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Wed, 05 Mar 2014 09:07:14 +0900
 
