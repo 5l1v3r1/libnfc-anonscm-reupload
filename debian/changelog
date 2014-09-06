@@ -1,3 +1,10 @@
+libnfc (1.7.1-2) unstable; urgency=medium
+
+  * Fix timeout message from ACR122U.
+    Add patches/fix_timeout_message_with_ACR122U.patch. (Closes: #759355)
+
+ -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Sun, 07 Sep 2014 03:14:23 +0900
+
 libnfc (1.7.1-1) unstable; urgency=low
 
   * New upstream released.
