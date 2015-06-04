@@ -27,6 +27,11 @@ override_dh_installchangelogs:
 override_dh_auto_configure: 
 	dh_auto_configure -- $(confflags)
 
+override_dh_auto_install:
+	dh_auto_install
+	install -d  debian/tmp/etc/nfc
+	install -m 644 libnfc.conf.sample debian/tmp/etc/nfc/libnfc.conf
+
 %:
 	dh $@ --with autoreconf
 
