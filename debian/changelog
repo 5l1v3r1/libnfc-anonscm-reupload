@@ -1,6 +1,7 @@
 libnfc (1.7.1-3) unstable; urgency=medium
 
   * Install libnfc.conf to /etc/nfc. (Closes: #776225)
+  * Bump Standards-Version to 3.9.6.
 
  -- Nobuhiro Iwamatsu <iwamatsu@debian.org>  Fri, 05 Jun 2015 09:01:42 +0900
 
